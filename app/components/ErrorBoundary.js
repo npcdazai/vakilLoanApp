@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React from "react";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -15,47 +15,51 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     });
 
     const errorDetails = {
       error: {
         message: error.message,
         stack: error.stack,
-        name: error.name
+        name: error.name,
       },
       errorInfo,
       timestamp: new Date().toISOString(),
-      userAgent: typeof window !== 'undefined' ? window.navigator?.userAgent : 'Server',
-      url: typeof window !== 'undefined' ? window.location?.href : 'Server'
+      userAgent:
+        typeof window !== "undefined" ? window.navigator?.userAgent : "Server",
+      url: typeof window !== "undefined" ? window.location?.href : "Server",
     };
 
     this.logError(errorDetails);
   }
 
   logError = (errorDetails) => {
-    const logLevel = this.props.logLevel || 'error';
-    
+    const logLevel = this.props.logLevel || "error";
+
     switch (logLevel) {
-      case 'console':
-        console.group('🚨 React Error Boundary');
-        console.error('Error:', errorDetails.error.message);
-        console.error('Stack:', errorDetails.error.stack);
-        console.error('Component Stack:', errorDetails.errorInfo.componentStack);
-        console.error('Full Details:', errorDetails);
+      case "console":
+        console.group("🚨 React Error Boundary");
+        console.error("Error:", errorDetails.error.message);
+        console.error("Stack:", errorDetails.error.stack);
+        console.error(
+          "Component Stack:",
+          errorDetails.errorInfo.componentStack
+        );
+        console.error("Full Details:", errorDetails);
         console.groupEnd();
         break;
-        
-      case 'api':
+
+      case "api":
         this.sendToAPI(errorDetails);
         break;
-        
-      case 'localStorage':
+
+      case "localStorage":
         this.saveToLocalStorage(errorDetails);
         break;
-        
+
       default:
-        console.error('Error Boundary:', errorDetails);
+        console.error("Error Boundary:", errorDetails);
         this.sendToAPI(errorDetails);
     }
   };
@@ -64,46 +68,54 @@ class ErrorBoundary extends React.Component {
     try {
       if (this.props.apiEndpoint) {
         await fetch(this.props.apiEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(errorDetails)
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(errorDetails),
         });
       }
-      console.error('API Error Log:', errorDetails);
+      console.error("API Error Log:", errorDetails);
     } catch (apiError) {
-      console.error('Failed to send error to API:', apiError);
+      console.error("Failed to send error to API:", apiError);
       this.saveToLocalStorage(errorDetails);
     }
   };
 
   saveToLocalStorage = (errorDetails) => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       try {
-        const existingLogs = JSON.parse(localStorage.getItem('errorLogs') || '[]');
+        const existingLogs = JSON.parse(
+          localStorage.getItem("errorLogs") || "[]"
+        );
         existingLogs.push(errorDetails);
-        
+
         if (existingLogs.length > 50) {
           existingLogs.splice(0, existingLogs.length - 50);
         }
-        
-        localStorage.setItem('errorLogs', JSON.stringify(existingLogs));
-        console.warn('Error saved to localStorage:', errorDetails.error.message);
+
+        localStorage.setItem("errorLogs", JSON.stringify(existingLogs));
+        console.warn(
+          "Error saved to localStorage:",
+          errorDetails.error.message
+        );
       } catch (storageError) {
-        console.error('Failed to save error to localStorage:', storageError);
+        console.error("Failed to save error to localStorage:", storageError);
       }
     }
   };
 
   getErrorUI() {
-    const errorMessage = this.state.error?.message || 'An unexpected error occurred';
-    
-    if (this.props.logLevel === 'console') {
+    const errorMessage =
+      this.state.error?.message || "An unexpected error occurred";
+
+    if (this.props.logLevel === "console") {
       return (
         <div className="w-2/3 bg-white p-10 rounded-l-3xl fixed right-0 top-0 h-screen overflow-y-auto flex items-center justify-center">
           <div className="text-center">
             <div className="text-orange-500 text-4xl mb-4">⚠️</div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">Form Error</h3>
-            <p className="text-gray-600 mb-4">There was an issue with the loan application form.</p>
+            <p className="text-gray-600 mb-4">
+              There was an issue with the loan application form.
+            </p>
             <button
               onClick={() => window.location.reload()}
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
@@ -115,13 +127,17 @@ class ErrorBoundary extends React.Component {
       );
     }
 
-    if (this.props.logLevel === 'localStorage') {
+    if (this.props.logLevel === "localStorage") {
       return (
         <div className="w-2/3 bg-red-50 p-10 rounded-l-3xl fixed right-0 top-0 h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="text-red-500 text-6xl mb-4">🚨</div>
-            <h2 className="text-2xl font-bold text-red-600 mb-2">Application Error</h2>
-            <p className="text-gray-600 mb-4">The loan application form encountered an error.</p>
+            <h2 className="text-2xl font-bold text-red-600 mb-2">
+              Application Error
+            </h2>
+            <p className="text-gray-600 mb-4">
+              The loan application form encountered an error.
+            </p>
             <button
               onClick={() => window.location.reload()}
               className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700"
@@ -141,10 +157,11 @@ class ErrorBoundary extends React.Component {
             Something went wrong
           </h2>
           <p className="text-gray-600 mb-4">
-            We&apos;re sorry, but an unexpected error occurred. Please try refreshing the page.
+            We&apos;re sorry, but an unexpected error occurred. Please try
+            refreshing the page.
           </p>
-          
-          {process.env.NODE_ENV === 'development' && (
+
+          {process.env.NODE_ENV === "development" && (
             <details className="text-left mt-4 p-4 bg-gray-50 rounded border">
               <summary className="cursor-pointer font-semibold text-red-600">
                 Error Details (Development Mode)
@@ -155,7 +172,7 @@ class ErrorBoundary extends React.Component {
               </pre>
             </details>
           )}
-          
+
           <div className="flex gap-2 mt-6">
             <button
               onClick={() => window.location.reload()}
@@ -164,7 +181,9 @@ class ErrorBoundary extends React.Component {
               Refresh Page
             </button>
             <button
-              onClick={() => this.setState({ hasError: false, error: null, errorInfo: null })}
+              onClick={() =>
+                this.setState({ hasError: false, error: null, errorInfo: null })
+              }
               className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
             >
               Try Again

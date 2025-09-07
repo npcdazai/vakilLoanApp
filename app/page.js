@@ -1,7 +1,20 @@
+"use client";
+
+import { useState } from "react";
 import LoanApplicationForm from "./components/LoanApplicationForm";
 import ErrorBoundary from "./components/ErrorBoundary";
+import WelcomeIntro from "./components/WelcomeIntro";
 
 export default function Home() {
+  const [showIntro, setShowIntro] = useState(true);
+
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+  };
+
+  if (showIntro) {
+    return <WelcomeIntro onComplete={handleIntroComplete} />;
+  }
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
       {/* Animated Background Blobs */}
