@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import ErrorBoundary from "./ErrorBoundary";
 import { logError } from "../utils/errorLogger";
+import DocumentsStep from "./DocumentsStep";
+import CongratsPage from "./CongratsPage";
 
 export default function LoanApplicationForm() {
   const [step, setStep] = useState(1);
@@ -220,103 +222,117 @@ export default function LoanApplicationForm() {
           })}
         </div>
 
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn text-sm"
-        >
-          {fields.map((field) => (
-            <div key={field.name}>
-              <label className="block text-gray-700">{field.label}</label>
+        {/* Conditional Rendering based on step */}
+        {step === 1 && (
+          <>
+            {/* Form */}
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn text-sm"
+            >
+              {fields.map((field) => (
+                <div key={field.name}>
+                  <label className="block text-gray-700">{field.label}</label>
 
-              {field.type === "select" ? (
-                <select
-                  {...register(field.name, { required: true })}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
-                >
-                  <option value="">
-                    Select {field.label.replace("*", "")}
-                  </option>
-                  {field.options.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              ) : field.type === "date" ? (
-                <input
-                  type="date"
-                  max={field.max}
-                  {...register(field.name, {
-                    required: `${field.label} is required`,
-                    validate: field.validate,
-                  })}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                />
-              ) : (
-                <input
-                  type="text"
-                  placeholder={field.placeholder}
-                  value={
-                    field.name === "loanAmount"
-                      ? field.format(watch(field.name) || "")
-                      : watch(field.name) || ""
-                  }
-                  onChange={(e) => {
-                    const val = field.parse
-                      ? field.parse(e.target.value)
-                      : e.target.value;
-                    setValue(field.name, val, { shouldValidate: true });
-                  }}
-                  {...register(field.name, {
-                    required: `${field.label} is required`,
-                    validate: field.validate,
-                  })}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                />
-              )}
+                  {field.type === "select" ? (
+                    <select
+                      {...register(field.name, { required: true })}
+                      className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                    >
+                      <option value="">
+                        Select {field.label.replace("*", "")}
+                      </option>
+                      {field.options.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  ) : field.type === "date" ? (
+                    <input
+                      type="date"
+                      max={field.max}
+                      {...register(field.name, {
+                        required: `${field.label} is required`,
+                        validate: field.validate,
+                      })}
+                      className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      placeholder={field.placeholder}
+                      value={
+                        field.name === "loanAmount"
+                          ? field.format(watch(field.name) || "")
+                          : watch(field.name) || ""
+                      }
+                      onChange={(e) => {
+                        const val = field.parse
+                          ? field.parse(e.target.value)
+                          : e.target.value;
+                        setValue(field.name, val, { shouldValidate: true });
+                      }}
+                      {...register(field.name, {
+                        required: `${field.label} is required`,
+                        validate: field.validate,
+                      })}
+                      className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    />
+                  )}
 
-              {errors[field.name] && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors[field.name].message}
-                </p>
-              )}
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[field.name].message}
+                    </p>
+                  )}
+                </div>
+              ))}
+
+              {/* Checkbox */}
+              <div className="col-span-1 md:col-span-2 mt-4">
+                <label className="flex items-start text-sm">
+                  <input
+                    type="checkbox"
+                    {...register("terms", { required: true })}
+                    className="mr-2 mt-1 cursor-pointer"
+                  />
+                  You agree to our{" "}
+                  <a href="#" className="text-indigo-600 underline ml-1">
+                    Terms of Service
+                  </a>{" "}
+                  and{" "}
+                  <a href="#" className="text-indigo-600 underline ml-1">
+                    Privacy Policy
+                  </a>
+                </label>
+                {errors.terms && (
+                  <p className="text-red-500 text-xs">You must accept Terms</p>
+                )}
+              </div>
+            </form>
+
+            {/* Button */}
+            <div className="mt-6">
+              <button
+                type="submit"
+                onClick={handleSubmit(onSubmit)}
+                className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md transition-transform duration-200 hover:scale-105 hover:bg-indigo-700 active:scale-95 cursor-pointer"
+              >
+                Next: Upload Documents
+              </button>
             </div>
-          ))}
+          </>
+        )}
 
-          {/* Checkbox */}
-          <div className="col-span-1 md:col-span-2 mt-4">
-            <label className="flex items-start text-sm">
-              <input
-                type="checkbox"
-                {...register("terms", { required: true })}
-                className="mr-2 mt-1 cursor-pointer"
-              />
-              You agree to our{" "}
-              <a href="#" className="text-indigo-600 underline ml-1">
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a href="#" className="text-indigo-600 underline ml-1">
-                Privacy Policy
-              </a>
-            </label>
-            {errors.terms && (
-              <p className="text-red-500 text-xs">You must accept Terms</p>
-            )}
-          </div>
-        </form>
+        {step === 2 && (
+          <DocumentsStep
+            onBack={() => setStep(1)}
+            onNext={() => setStep(3)}
+          />
+        )}
 
-        {/* Button */}
-        <div className="mt-6">
-          <button
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-            className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md transition-transform duration-200 hover:scale-105 hover:bg-indigo-700 active:scale-95 cursor-pointer"
-          >
-            {step < 3 ? "Next: Upload Documents" : "Finish"}
-          </button>
-        </div>
+        {step === 3 && ( <CongratsPage/> )}
       </div>
     </ErrorBoundary>
   );
