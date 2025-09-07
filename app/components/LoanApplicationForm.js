@@ -155,7 +155,15 @@ export default function LoanApplicationForm() {
 
   return (
     <ErrorBoundary logLevel="console">
-      <div className="w-full md:w-2/3 bg-white p-6 md:p-10 rounded-none md:rounded-l-3xl fixed md:right-0 top-0 h-screen overflow-y-auto transition-all duration-500 ease-in-out">
+      <div
+        className="w-full max-w-full md:max-w-[65%] mx-auto 
+             bg-white p-4 md:p-10 
+             rounded-2xl md:rounded-2xl 
+             shadow-none md:shadow-xl 
+             border-0 md:border md:border-gray-100
+             h-screen md:max-h-[97vh] 
+             overflow-y-auto transition-all duration-500 ease-in-out"
+      >
         {/* Stepper */}
         {/* Stepper */}
         <div className="flex items-center justify-between mb-10 relative">
@@ -326,13 +334,10 @@ export default function LoanApplicationForm() {
         )}
 
         {step === 2 && (
-          <DocumentsStep
-            onBack={() => setStep(1)}
-            onNext={() => setStep(3)}
-          />
+          <DocumentsStep onBack={() => setStep(1)} onNext={() => setStep(3)} />
         )}
 
-        {step === 3 && ( <CongratsPage/> )}
+        {step === 3 && <CongratsPage />}
       </div>
     </ErrorBoundary>
   );

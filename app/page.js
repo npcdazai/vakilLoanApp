@@ -12,17 +12,17 @@ export default function Home() {
     setShowIntro(false);
   };
 
-  if (showIntro) {
-    return <WelcomeIntro onComplete={handleIntroComplete} />;
-  }
+  // if (showIntro) {
+  //   return <WelcomeIntro onComplete={handleIntroComplete} />;
+  // }
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+    <div className="min-h-screen p-[8px] flex flex-col lg:flex-row bg-[#d4dcea] relative overflow-hidden">
       {/* Animated Background Blobs */}
       <div className="absolute -top-20 -left-20 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
       <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-700"></div>
 
       {/* Left Section */}
-      <div className="hidden lg:flex lg:w-1/3 bg-gradient-to-b from-indigo-600 to-purple-600 text-white p-10 rounded-r-3xl flex-col justify-center relative z-10 shadow-xl">
+      <div className="hidden lg:flex lg:w-1/3 bg-gradient-to-b from-indigo-600 to-purple-600 text-white p-10 rounded-2xl flex-col justify-center relative z-10 shadow-xl">
         {/* Logo */}
         <h1 className="text-3xl font-extrabold mb-6 flex items-center">
           <span className="bg-white text-indigo-600 p-3 rounded-2xl mr-3 animate-bounce shadow-lg">
@@ -70,9 +70,11 @@ export default function Home() {
       </div>
 
       {/* Right Section - Loan Form */}
-      <ErrorBoundary logLevel="localStorage">
-        <LoanApplicationForm />
-      </ErrorBoundary>
+      {/* <div className="bg-[] p-2"> */}
+        <ErrorBoundary logLevel="localStorage">
+          <LoanApplicationForm />
+        </ErrorBoundary>
+      {/* </div> */}
     </div>
   );
 }

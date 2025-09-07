@@ -4,12 +4,7 @@ import { useForm } from "react-hook-form";
 import { Upload } from "lucide-react"; // Icon (can use any)
 
 export default function DocumentsStep({ onBack, onNext }) {
-  const { register, handleSubmit } = useForm();
-
-  const onSubmit = (data) => {
-    console.log("Uploaded Documents:", data);
-    onNext(); // move to confirmation step
-  };
+  const { register, handleSubmit, formState: { errors }, watch } = useForm();
 
   const documents = [
     { label: "Aadhaar Card", name: "aadhaar" },
@@ -17,6 +12,19 @@ export default function DocumentsStep({ onBack, onNext }) {
     { label: "Bank Statement (Last 3 months)", name: "bankStatement" },
     { label: "Salary Slip (Last 3 months)", name: "salarySlip" },
   ];
+
+  const watchedFiles = watch();
+  
+  const allRequiredFilesUploaded = documents.every(doc => 
+    watchedFiles[doc.name] && watchedFiles[doc.name].length > 0
+  );
+
+  const onSubmit = (data) => {
+    if (allRequiredFilesUploaded) {
+      console.log("Uploaded Documents:", data);
+      onNext(); // move to confirmation step
+    }
+  };
 
   return (
     <div className="animate-fadeIn">
@@ -41,7 +49,7 @@ export default function DocumentsStep({ onBack, onNext }) {
               <p className="text-xs text-gray-400">PDF, JPG, PNG (Max: 5MB)</p>
               <input
                 type="file"
-                {...register(doc.name)}
+                {...register(doc.name, { required: `${doc.label} is required` })}
                 accept=".pdf,.jpg,.jpeg,.png"
                 className="hidden"
               />
@@ -60,7 +68,12 @@ export default function DocumentsStep({ onBack, onNext }) {
           </button>
           <button
             type="submit"
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition"
+            disabled={!allRequiredFilesUploaded}
+            className={`px-6 py-2 rounded-lg shadow-md transition ${
+              allRequiredFilesUploaded
+                ? "bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
           >
             Submit Application
           </button>
