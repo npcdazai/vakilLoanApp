@@ -1,103 +1,302 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+export default function LoanApplicationForm() {
+  const [step, setStep] = useState(1);
+
+  const steps = [
+    { id: 1, name: "Personal Details" },
+    { id: 2, name: "Documents" },
+    { id: 3, name: "Confirmation" },
+  ];
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue, // ✅ FIX: import setValue
+  } = useForm();
+
+  const today = new Date();
+  const minAgeDate = new Date(
+    today.getFullYear() - 18,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+
+  const fields = [
+    {
+      label: "Loan Type*",
+      name: "loanType",
+      type: "select",
+      options: ["Personal Loan", "Home Loan", "Car Loan"],
+    },
+    {
+      label: "Employment Profile*",
+      name: "employment",
+      type: "select",
+      options: ["Salaried", "Self Employed"],
+    },
+    {
+      label: "Monthly Income (₹)*",
+      name: "income",
+      type: "number",
+      placeholder: "50,000",
+    },
+    {
+      label: "Loan Amount (₹)*",
+      name: "loanAmount",
+      type: "text",
+      placeholder: "1,00,000",
+      format: (value) => {
+        if (!value) return "";
+        const raw = value.replace(/\D/g, "");
+        return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      },
+      parse: (value) => value.replace(/,/g, ""),
+    },
+    {
+      label: "First Name*",
+      name: "firstName",
+      type: "text",
+      placeholder: "As per PAN card",
+    },
+    {
+      label: "Last Name*",
+      name: "lastName",
+      type: "text",
+      placeholder: "As per PAN card",
+    },
+    {
+      label: "Mobile Number*",
+      name: "mobile",
+      type: "text",
+      placeholder: "9876543210",
+    },
+    {
+      label: "Email Address*",
+      name: "email",
+      type: "email",
+      placeholder: "name@example.com",
+    },
+    {
+      label: "Gender*",
+      name: "gender",
+      type: "select",
+      options: ["Male", "Female", "Other"],
+    },
+    {
+      label: "Date of Birth*",
+      name: "dob",
+      type: "date",
+      max: minAgeDate,
+      validate: (value) => {
+        if (!value) return "Date of Birth is required";
+        const dob = new Date(value);
+        const today = new Date();
+        const age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        const isBirthdayPassed =
+          m > 0 || (m === 0 && today.getDate() >= dob.getDate());
+        const exactAge = isBirthdayPassed ? age : age - 1;
+        return exactAge >= 18 || "You must be at least 18 years old";
+      },
+    },
+    {
+      label: "PAN Number*",
+      name: "pan",
+      type: "text",
+      placeholder: "ABCDE1234F",
+      validate: (value) => {
+        if (!value) return "PAN Number is required";
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        return panRegex.test(value) || "Invalid PAN format (e.g., ABCDE1234F)";
+      },
+    },
+    {
+      label: "PIN Code*",
+      name: "pincode",
+      type: "text",
+      placeholder: "400001",
+    },
+  ];
+
+  const onSubmit = (data) => {
+    console.log("Form Submitted:", data);
+    if (step < 3) {
+      setStep(step + 1);
+    } else {
+      alert("Application Completed ✅");
+    }
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Left Section */}
+      <div className="w-1/3 bg-gradient-to-b from-indigo-500 to-purple-500 text-white p-10 rounded-r-3xl flex flex-col justify-center">
+        <h1 className="text-2xl font-bold mb-4 flex items-center">
+          <span className="bg-white text-indigo-600 p-2 rounded-full mr-2 animate-bounce">
+            💰
+          </span>
+          LoanApp
+        </h1>
+        <h2 className="text-xl font-semibold mb-4">Quick Approval</h2>
+        <p className="mb-6">
+          Get instant loan approval decisions within minutes of application
+          submission
+        </p>
+        <ul className="space-y-3 text-sm">
+          <li>✨ Multiple loan options available</li>
+          <li>✨ No hidden fees or charges</li>
+          <li>✨ 24/7 customer support</li>
+          <li>✨ Flexible repayment terms</li>
+        </ul>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Right Section */}
+      <div className="w-2/3 bg-white p-10 rounded-l-3xl fixed right-0 top-0 h-screen overflow-y-auto transition-all duration-500 ease-in-out">
+        {/* Stepper */}
+        <div className="flex justify-between mb-10">
+          {steps.map((s, idx) => (
+            <div
+              key={s.id}
+              className="flex-1 flex flex-col items-center relative"
+            >
+              <div
+                className={`w-10 h-10 flex items-center justify-center rounded-full text-white cursor-pointer transition-all duration-300 ${
+                  step === s.id
+                    ? "bg-indigo-600 scale-110 shadow-lg"
+                    : step > s.id
+                    ? "bg-green-500"
+                    : "bg-gray-300"
+                }`}
+                onClick={() => setStep(s.id)}
+              >
+                {s.id}
+              </div>
+              <p
+                className={`text-xs mt-2 transition-colors ${
+                  step === s.id
+                    ? "text-indigo-600 font-semibold"
+                    : "text-gray-500"
+                }`}
+              >
+                {s.name}
+              </p>
+              {idx < steps.length - 1 && (
+                <div
+                  className={`absolute top-5 left-[60%] w-full h-1 transition-all duration-500 ${
+                    step > s.id ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                ></div>
+              )}
+            </div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid grid-cols-2 gap-6 animate-fadeIn text-sm"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {fields.map((field) => (
+            <div key={field.name}>
+              <label className="block text-gray-700">{field.label}</label>
+
+              {field.type === "select" ? (
+                <select
+                  {...register(field.name, { required: true })}
+                  className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all cursor-pointer"
+                >
+                  <option value="">
+                    Select {field.label.replace("*", "")}
+                  </option>
+                  {field.options.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              ) : field.type === "date" ? (
+                <input
+                  type="date"
+                  max={field.max}
+                  {...register(field.name, {
+                    required: `${field.label} is required`,
+                    validate: field.validate,
+                  })}
+                  className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                />
+              ) : (
+                <input
+                  type="text"
+                  placeholder={field.placeholder}
+                  value={
+                    field.name === "loanAmount"
+                      ? field.format(watch(field.name) || "")
+                      : watch(field.name) || ""
+                  }
+                  onChange={(e) => {
+                    const val = field.parse
+                      ? field.parse(e.target.value)
+                      : e.target.value;
+                    setValue(field.name, val, { shouldValidate: true }); // ✅ FIXED
+                  }}
+                  {...register(field.name, {
+                    required: `${field.label} is required`,
+                    validate: field.validate,
+                  })}
+                  className="mt-1 block w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                />
+              )}
+
+              {errors[field.name] && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors[field.name].message}
+                </p>
+              )}
+            </div>
+          ))}
+
+          {/* Checkbox */}
+          <div className="col-span-2 mt-4">
+            <label className="flex items-start text-sm">
+              <input
+                type="checkbox"
+                {...register("terms", { required: true })}
+                className="mr-2 mt-1 cursor-pointer"
+              />
+              You agree to our{" "}
+              <a href="#" className="text-indigo-600 underline ml-1">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="text-indigo-600 underline ml-1">
+                Privacy Policy
+              </a>
+            </label>
+            {errors.terms && (
+              <p className="text-red-500 text-xs">You must accept Terms</p>
+            )}
+          </div>
+        </form>
+
+        {/* Button */}
+        <div className="mt-6">
+          <button
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
+            className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md transition-transform duration-200 hover:scale-105 hover:bg-indigo-700 active:scale-95 cursor-pointer"
+          >
+            {step < 3 ? "Next: Upload Documents" : "Finish"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
