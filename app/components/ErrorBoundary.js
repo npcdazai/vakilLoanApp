@@ -141,7 +141,7 @@ class ErrorBoundary extends React.Component {
             Something went wrong
           </h2>
           <p className="text-gray-600 mb-4">
-            We're sorry, but an unexpected error occurred. Please try refreshing the page.
+            We&apos;re sorry, but an unexpected error occurred. Please try refreshing the page.
           </p>
           
           {process.env.NODE_ENV === 'development' && (
